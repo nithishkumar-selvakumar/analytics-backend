@@ -3,8 +3,16 @@ import { pool } from "./postgres.js";
 import { ctxLogger } from "../core/getLogger.js";
 
 const appStart = Date.now();
+type QueryOptions = {
+  queryName?: string;
+  system?: string;
+};
 
-export async function query<T>(text: string, params?: unknown[]): Promise<T[]> {
+export async function query<T>(
+  text: string,
+  params?: unknown[],
+  options?: QueryOptions,
+): Promise<T[]> {
   const start = performance.now();
   try {
     const result = await pool.query(text, params);
@@ -14,18 +22,31 @@ export async function query<T>(text: string, params?: unknown[]): Promise<T[]> {
 
     if (!isWarmup && duration > config.db.slowQueryThreshold) {
       ctxLogger().warn(
-        { duration, rows: result.rowCount, query: text },
+        {
+          queryName: options?.queryName ?? "anonymous",
+          duration,
+          rows: result.rowCount,
+          query: text,
+        },
         "Slow query detected",
       );
     } else {
       ctxLogger().debug(
-        { duration, rows: result.rowCount, query: text },
+        {
+          queryName: options?.queryName ?? "anonymous",
+          duration,
+          rows: result.rowCount,
+          query: text,
+        },
         "Query executed",
       );
     }
     return result.rows as T[];
   } catch (error) {
-    ctxLogger().error({ error, query: text }, "Database query failed");
+    ctxLogger().error(
+      { queryName: options?.queryName ?? "anonymous", error, query: text },
+      "Database query failed",
+    );
     throw error;
   }
 }

@@ -11,12 +11,12 @@ export function createApp() {
   app.use(requestPerformance);
 
   app.get("/test-slow", async (req: Request, res: Response) => {
-    await query("SELECT pg_sleep(2);"); // simulate a slow query
+    await query("SELECT pg_sleep(2);", [], { queryName: "slow-query" }); // simulate a slow query
     res.send("slow query executed");
   });
 
   app.get("/test-fast", async (req: Request, res: Response) => {
-    await query("SELECT NOW();"); // simulate a fast query
+    await query("SELECT NOW();", [], { queryName: "fast-query" }); // simulate a fast query
     res.send("fast query executed");
   });
 
