@@ -2,6 +2,7 @@ import express, { type Request, type Response } from "express";
 import { query } from "./db/query.js";
 import { requestPerformance } from "./core/middleware/requestLogger.js";
 import { requestId } from "./core/middleware/requestId.js";
+import { getMetrics } from "./core/dbMetrics.js";
 // import routes
 
 export function createApp() {
@@ -11,13 +12,24 @@ export function createApp() {
   app.use(requestPerformance);
 
   app.get("/test-slow", async (req: Request, res: Response) => {
-    await query("SELECT pg_sleep(2);", [], { queryName: "slow-query" }); // simulate a slow query
+    await query("SELECT pg_sleep(20);", [], { queryName: "slow-query" }); // simulate a slow query
     res.send("slow query executed");
   });
 
   app.get("/test-fast", async (req: Request, res: Response) => {
     await query("SELECT NOW();", [], { queryName: "fast-query" }); // simulate a fast query
     res.send("fast query executed");
+  });
+
+  app.get("/metrics/db", (_req, res) => {
+    res.json(getMetrics());
+  });
+
+  app.get("/test-multi", async (_req, res) => {
+    for (let i = 0; i < 20; i++) {
+      await query("SELECT NOW()", [], { queryName: `multi-query-${i + 1}` }); // simulate multiple queries
+    }
+    res.send("done");
   });
 
   app.use((req, _res, next) => {

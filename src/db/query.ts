@@ -1,11 +1,14 @@
 import { config } from "../core/config.js";
 import { pool } from "./postgres.js";
 import { ctxLogger } from "../core/getLogger.js";
+import { recordQuery } from "../core/dbMetrics.js";
+import { getContext } from "../core/asyncContext.js";
 
 const appStart = Date.now();
+
 type QueryOptions = {
   queryName?: string;
-  system?: string;
+  system?: boolean;
 };
 
 export async function query<T>(
@@ -19,8 +22,28 @@ export async function query<T>(
 
     const duration = performance.now() - start;
     const isWarmup = Date.now() - appStart < 5000;
+    const isSlow = !isWarmup && duration > config.db.slowQueryThreshold;
+    const ctx = getContext();
 
-    if (!isWarmup && duration > config.db.slowQueryThreshold) {
+    if (ctx?.dbMetrics) {
+      ctx.dbMetrics!.totalQueries += 1;
+      ctx.dbMetrics!.totalQueryTime += duration;
+      if (isSlow) {
+        ctx.dbMetrics!.slowQueries += 1;
+      }
+    }
+    recordQuery(duration, isSlow);
+    if (duration > config.db.longQueryThreshold) {
+      ctxLogger().error(
+        {
+          queryName: options?.queryName ?? "anonymous",
+          duration,
+          rows: result.rowCount,
+          query: text,
+        },
+        "Long query detected",
+      );
+    } else if (isSlow) {
       ctxLogger().warn(
         {
           queryName: options?.queryName ?? "anonymous",
@@ -44,7 +67,11 @@ export async function query<T>(
     return result.rows as T[];
   } catch (error) {
     ctxLogger().error(
-      { queryName: options?.queryName ?? "anonymous", error, query: text },
+      {
+        queryName: options?.queryName ?? "anonymous",
+        error,
+        query: text,
+      },
       "Database query failed",
     );
     throw error;

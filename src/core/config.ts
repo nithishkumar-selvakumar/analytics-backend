@@ -13,6 +13,7 @@ export const config = {
     poolSize: 10, // because of neon  the poolsize will be 10 by default, you can adjust it based on your needs
     statementTimeout: 5000, // ms (server-side timeout)
     slowQueryThreshold: 200, // ms (log if slower)
+    longQueryThreshold: 10000, // ms (log as error if slower)
   },
   redis: {
     url: env?.REDIS_URL,

@@ -10,7 +10,18 @@ export function requestId(req: Request, res: Response, next: NextFunction) {
 
   res.setHeader("x-request-id", id);
 
-  asyncContext.run({ requestId: id, logger: childLogger }, () => {
-    next();
-  });
+  asyncContext.run(
+    {
+      requestId: id,
+      logger: childLogger,
+      dbMetrics: {
+        totalQueries: 0,
+        slowQueries: 0,
+        totalQueryTime: 0,
+      },
+    },
+    () => {
+      next();
+    },
+  );
 }
