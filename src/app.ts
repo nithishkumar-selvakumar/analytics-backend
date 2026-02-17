@@ -12,7 +12,7 @@ export function createApp() {
   app.use(requestPerformance);
 
   app.get("/test-slow", async (req: Request, res: Response) => {
-    await query("SELECT pg_sleep(2);", [], { queryName: "slow-query" }); // simulate a slow query
+    await query("SELECT pg_sleep(20);", [], { queryName: "slow-query" }); // simulate a slow query
     res.send("slow query executed");
   });
 
@@ -23,6 +23,13 @@ export function createApp() {
 
   app.get("/metrics/db", (_req, res) => {
     res.json(getMetrics());
+  });
+
+  app.get("/test-multi", async (_req, res) => {
+    for (let i = 0; i < 20; i++) {
+      await query("SELECT NOW()", [], { queryName: `multi-query-${i + 1}` }); // simulate multiple queries
+    }
+    res.send("done");
   });
 
   app.use((req, _res, next) => {

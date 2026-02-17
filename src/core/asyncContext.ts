@@ -5,6 +5,11 @@ import pino from "pino";
 type store = {
   requestId: string;
   logger?: pino.Logger;
+  dbMetrics?: {
+    totalQueries: number;
+    slowQueries: number;
+    totalQueryTime: number;
+  };
 };
 
 export const asyncContext = new AsyncLocalStorage<store>();
