@@ -2,6 +2,7 @@ import express, { type Request, type Response } from "express";
 import { query } from "./db/query.js";
 import { requestPerformance } from "./core/middleware/requestLogger.js";
 import { requestId } from "./core/middleware/requestId.js";
+import { getMetrics } from "./core/dbMetrics.js";
 // import routes
 
 export function createApp() {
@@ -18,6 +19,10 @@ export function createApp() {
   app.get("/test-fast", async (req: Request, res: Response) => {
     await query("SELECT NOW();", [], { queryName: "fast-query" }); // simulate a fast query
     res.send("fast query executed");
+  });
+
+  app.get("/metrics/db", (_req, res) => {
+    res.json(getMetrics());
   });
 
   app.use((req, _res, next) => {

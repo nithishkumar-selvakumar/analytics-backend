@@ -1,6 +1,7 @@
 import { config } from "../core/config.js";
 import { pool } from "./postgres.js";
 import { ctxLogger } from "../core/getLogger.js";
+import { recordQuery } from "../core/dbMetrics.js";
 
 const appStart = Date.now();
 type QueryOptions = {
@@ -19,8 +20,9 @@ export async function query<T>(
 
     const duration = performance.now() - start;
     const isWarmup = Date.now() - appStart < 5000;
-
-    if (!isWarmup && duration > config.db.slowQueryThreshold) {
+    const isSlow = !isWarmup && duration > config.db.slowQueryThreshold;
+    recordQuery(duration, isSlow);
+    if (isSlow) {
       ctxLogger().warn(
         {
           queryName: options?.queryName ?? "anonymous",
