@@ -8,21 +8,22 @@ export function requestPerformance(
   next: NextFunction,
 ) {
   const start = performance.now();
+  const ctxStart = getContext();
+  const log = ctxStart?.logger || ctxLogger();
 
-  ctxLogger().info(
+  log.info(
     {
       startTime: new Date().toISOString(),
       method: req.method,
       url: req.originalUrl,
-      requestId: getContext()?.requestId,
+      routeName: ctxStart?.routeName || "unknown",
     },
     "Request started",
   );
 
   res.on("finish", () => {
-    const duration = performance.now() - start;
     const ctx = getContext();
-
+    const duration = performance.now() - start;
     const queries = ctx?.dbMetrics?.totalQueries ?? 0;
     const dbTime = ctx?.dbMetrics?.totalQueryTime ?? 0;
     const slowQueries = ctx?.dbMetrics?.slowQueries ?? 0;
@@ -32,8 +33,9 @@ export function requestPerformance(
 
     const appTime = Number(Math.max(duration - dbTime, 0).toFixed(1));
 
-    ctxLogger().info(
+    log.info(
       {
+        routeName: ctx?.routeName,
         method: req.method,
         url: req.originalUrl,
         status: res.statusCode,

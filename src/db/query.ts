@@ -3,6 +3,7 @@ import { pool } from "./postgres.js";
 import { ctxLogger } from "../core/getLogger.js";
 import { recordQuery } from "../core/dbMetrics.js";
 import { getContext } from "../core/asyncContext.js";
+import { routeName } from "../core/middleware/routeName.js";
 
 const appStart = Date.now();
 
@@ -36,6 +37,7 @@ export async function query<T>(
     if (duration > config.db.longQueryThreshold) {
       ctxLogger().error(
         {
+          routeName: ctx?.routeName,
           queryName: options?.queryName ?? "anonymous",
           duration,
           rows: result.rowCount,
@@ -46,6 +48,7 @@ export async function query<T>(
     } else if (isSlow) {
       ctxLogger().warn(
         {
+          routeName: ctx?.routeName,
           queryName: options?.queryName ?? "anonymous",
           duration,
           rows: result.rowCount,
@@ -56,6 +59,7 @@ export async function query<T>(
     } else {
       ctxLogger().debug(
         {
+          routeName: ctx?.routeName,
           queryName: options?.queryName ?? "anonymous",
           duration,
           rows: result.rowCount,
@@ -68,6 +72,7 @@ export async function query<T>(
   } catch (error) {
     ctxLogger().error(
       {
+        routeName: getContext()?.routeName,
         queryName: options?.queryName ?? "anonymous",
         error,
         query: text,

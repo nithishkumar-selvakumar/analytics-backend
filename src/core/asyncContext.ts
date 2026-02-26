@@ -5,6 +5,7 @@ import pino from "pino";
 type store = {
   requestId: string;
   logger?: pino.Logger;
+  routeName?: string;
   dbMetrics?: {
     totalQueries: number;
     slowQueries: number;
