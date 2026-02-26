@@ -6,6 +6,9 @@ import { getMetrics } from "./core/dbMetrics.js";
 import { routeName } from "./core/middleware/routeName.js";
 import { errorHandler } from "./core/errorHandler.js";
 import { asyncHandler } from "./core/asyncHandler.js";
+import { validateBody } from "./core/validate.js";
+import { createEventSchema } from "./modules/analytics/analytics.schema.js";
+
 // import routes
 
 export function createApp() {
@@ -13,6 +16,18 @@ export function createApp() {
   app.use(express.json());
   app.use(requestId);
   app.use(requestPerformance);
+
+  app.post(
+    "/events",
+    routeName("events"),
+    validateBody(createEventSchema),
+    asyncHandler(async (req, res) => {
+      res.json({
+        success: true,
+        data: req.body,
+      });
+    }),
+  );
 
   app.get(
     "/test-slow",
