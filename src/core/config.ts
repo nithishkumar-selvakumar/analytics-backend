@@ -17,6 +17,8 @@ export const config = {
   },
   redis: {
     url: env?.REDIS_URL,
+    host: env?.REDIS_HOST,
+    port: env?.REDIS_PORT,
   },
   logger: {
     level: env?.LOG_LEVEL,

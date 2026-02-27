@@ -16,6 +16,8 @@ export const envSchema = z.object({
   PORT: z.coerce.number().default(9000),
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
   REDIS_URL: z.string().default("redis://localhost:6379"),
+  REDIS_HOST: z.string().min(1, "Redis host is required"),
+  REDIS_PORT: z.coerce.number().min(1, "redis port is required"),
   LOG_LEVEL: z.string().default("info"),
 });
 
@@ -26,6 +28,7 @@ if (!parsed.success) {
     { errors: z.treeifyError(parsed.error) },
     "Environment validation failed",
   );
+  process.exit(1);
 }
 
 export const env = parsed.data;
