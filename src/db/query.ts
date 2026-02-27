@@ -3,7 +3,6 @@ import { pool } from "./postgres.js";
 import { ctxLogger } from "../core/getLogger.js";
 import { recordQuery } from "../core/dbMetrics.js";
 import { getContext } from "../core/asyncContext.js";
-import { routeName } from "../core/middleware/routeName.js";
 
 const appStart = Date.now();
 

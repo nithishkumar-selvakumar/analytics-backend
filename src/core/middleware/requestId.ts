@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import { logger } from "../logger.js";
 import { asyncContext } from "../asyncContext.js";
 
-export function requestId(req: Request, res: Response, next: NextFunction) {
+export function requestId(_req: Request, res: Response, next: NextFunction) {
   const id = randomUUID();
 
   const childLogger = logger.child({ requestId: id });
