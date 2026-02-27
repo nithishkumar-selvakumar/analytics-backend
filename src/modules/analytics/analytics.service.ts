@@ -1,7 +1,7 @@
-import { insertEvent } from "./analytics.repo.js";
+import { enqueueEventJob } from "./analytics.job.js";
 import { CreateEventInput } from "./analytics.schema.js";
 
 export async function createEventService(input: CreateEventInput) {
-  const event = await insertEvent(input);
-  return event;
+  await enqueueEventJob(input);
+  return { queued: true };
 }
