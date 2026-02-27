@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { ZodType } from "zod";
+
 import { AppError } from "./error.js";
 
 export function validateBody<T>(schema: ZodType<T>) {

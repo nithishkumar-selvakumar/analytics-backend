@@ -1,4 +1,5 @@
 import { Queue } from "bullmq";
+
 import { config } from "../../core/config.js";
 
 export const analyticsQueue = new Queue("analytics", {
