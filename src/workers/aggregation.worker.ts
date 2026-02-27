@@ -1,7 +1,8 @@
 import { Worker } from "bullmq";
+
 import { config } from "../core/config.js";
-import { insertEvent } from "../modules/analytics/analytics.repo.js";
 import { logger } from "../core/logger.js";
+import { insertEvent } from "../modules/analytics/analytics.repo.js";
 
 new Worker(
   "analytics",

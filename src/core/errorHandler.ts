@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from "express";
+
 import { getContext } from "./asyncContext.js";
-import { ctxLogger } from "./getLogger.js";
 import { AppError } from "./error.js";
+import { ctxLogger } from "./getLogger.js";
 
 export const errorHandler = (
   err: unknown,

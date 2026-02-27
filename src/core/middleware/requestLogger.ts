@@ -1,6 +1,7 @@
 import { Request, NextFunction, Response } from "express";
-import { ctxLogger } from "../getLogger.js";
+
 import { getContext } from "../asyncContext.js";
+import { ctxLogger } from "../getLogger.js";
 
 export function requestPerformance(
   req: Request,

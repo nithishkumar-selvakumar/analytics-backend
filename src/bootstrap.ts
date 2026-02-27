@@ -1,7 +1,7 @@
 import { createApp } from "./app.js";
+import { config } from "./core/config.js";
 import { logger } from "./core/logger.js";
 import { pool } from "./db/postgres.js";
-import { config } from "./core/config.js";
 export async function bootstrap() {
   logger.info("Starting analytics backend...");
 
